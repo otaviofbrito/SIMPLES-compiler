@@ -1,0 +1,14 @@
+/* ----
+Exemplo programa simples
+------*/
+
+PROGRAMA um
+  INTEIRO a b // declaracao de variaveis
+INICIO
+  LEIA a
+  LEIA b
+  ENQUANTO a < b FACA
+    ESCREVA a
+    a <- a + 1
+  FIMENQUANTO
+FIMPROGRAMA
