@@ -15,7 +15,7 @@ int nlines = 1;
 %%
 PROGRAMA              printf("%3d|%11s: reservada\n", nlines, yytext);
 INICIO                printf("%3d|%11s: reservada\n", nlines, yytext);
-FIMPROGRAMA                printf("%3d|%11s: reservada\n", nlines, yytext);
+FIMPROGRAMA           printf("%3d|%11s: reservada\n", nlines, yytext);
 
 LEIA                  printf("%3d|%11s: reservada\n", nlines, yytext);
 ESCREVA               printf("%3d|%11s: reservada\n", nlines, yytext);
@@ -26,7 +26,7 @@ SENAO                 printf("%3d|%11s: reservada\n", nlines, yytext);
 FIMSE                 printf("%3d|%11s: reservada\n", nlines, yytext);
 
 ENQUANTO              printf("%3d|%11s: reservada\n", nlines, yytext);
-FACA              printf("%3d|%11s: reservada\n", nlines, yytext);
+FACA                  printf("%3d|%11s: reservada\n", nlines, yytext);
 FIMENQUANTO           printf("%3d|%11s: reservada\n", nlines, yytext);
 
 INTEIRO               printf("%3d|%11s: reservada -> tipo\n", nlines, yytext);
