@@ -1,13 +1,14 @@
 %{
 #include "sintatico.h" 
 void erro (char *s); 
+char atomo[100];
 %}
 
 
-identifier      [a-zA-Z]([a-zA-Z0-9])*
-number          [0-9]+
-blank_space     [ \t]+
-new_line        [\n]
+identificador      [a-zA-Z]([a-zA-Z0-9])*
+numero             [0-9]+
+espaco             [ \t]+
+novalinha          [\n]
 
 %option noyywrap
 
@@ -53,10 +54,10 @@ nao                   return T_NAO;
 
 
 
-{identifier}           return T_IDENTIF;
-{number}               return T_NUMERO;
-{blank_space}         
-{new_line}             
+{identificador}       { strcpy(atomo, yytext); return T_IDENTIF;}
+{numero}              { strcpy(atomo, yytext); return T_NUMERO;}
+{espaco}         
+{novalinha}             
 .                      erro("LEXICO");
 
 %%

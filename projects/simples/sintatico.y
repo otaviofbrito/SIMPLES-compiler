@@ -5,8 +5,14 @@
 #include <stdarg.h>
 
 #include "lexico.c"
+#include "utils.c"
+
 void erro(char *);
 int yyerror(char *);
+
+int conta = 0;
+int rot = 0;
+
 %}
 
 
@@ -63,16 +69,17 @@ int yyerror(char *);
 %%
 programa 
   : cabecalho variaveis
-
+    {mostra_tabela();}
     {
-       printf("\tAMEM\tx\n");
+       fprintf(yyout, "\tAMEM\t%d\n", conta);
+       empilha(conta);
     }
 
   T_INICIO lista_comandos T_FIMPROGRAMA
 
   {
-       printf("\tDMEM\tx\n");
-       printf("\tFIMP\tx\n");
+       fprintf(yyout, "\tDMEM\t%d\n", desempilha());
+       fprintf(yyout, "\tFIMP\n");
   }
 
   ;
@@ -81,7 +88,7 @@ cabecalho
   : T_PROGRAMA T_IDENTIF
 
     {
-       printf("\tINPP\n");
+       fprintf(yyout, "\tINPP\n");
     }
 
   ;
@@ -102,8 +109,18 @@ tipo
   ;
 
 lista_variaveis
-  : T_IDENTIF lista_variaveis
+  : lista_variaveis T_IDENTIF 
+  {
+    strcpy(elem_tab.id, atomo);
+    elem_tab.endereco = conta++;   //adicionando variaveis na tab de simbolo
+    insere_simbolo(elem_tab);
+  }
   | T_IDENTIF
+  {
+    strcpy(elem_tab.id, atomo);
+    elem_tab.endereco = conta++; 
+    insere_simbolo(elem_tab);
+  }
   ;
 
 lista_comandos
@@ -123,93 +140,134 @@ comando
 leitura
   : T_LEIA T_IDENTIF
 
-    { printf("\tLEIA\n");}
-    { printf("\tARZG\tx\n");}
+    { 
+     fprintf(yyout, "\tLEIA\n");
+     int pos = busca_simbolo(atomo);
+     if(pos == -1)
+        erro("Variavel nao declarada!");
+     fprintf(yyout, "\tARZG\t%d\n", TabSimb[pos].endereco);
+     
+     
+     }
 
   ;
 
 escrita
   : T_ESCREVA expr
 
-    { printf("\tESCR\n");}
+    { fprintf(yyout, "\tESCR\n");}
 
   ;
 
 repeticao
   : T_ENQUANTO
 
-    { printf("Lx\tNADA\n");}
+    {
+      rot++;
+      fprintf(yyout, "L%d\tNADA\n", rot);
+      empilha(rot); 
+    }
 
     expr T_FACA 
     
-    { printf("\tDSVF\tLy\n");}
+    {
+      rot++; 
+      fprintf(yyout, "\tDSVF\tL%d\n", rot);
+      empilha(rot);
+    }
 
     lista_comandos T_FIMENQUANTO
 
-    { printf("\tDSVS\tLx\n");}
-    { printf("Ly\tNADA\n");}
+    {
+      int rot_fim_rep = desempilha();
+      int rot_ini_rep = desempilha(); 
+      fprintf(yyout, "\tDSVS\tL%d\n", rot_ini_rep);
+      fprintf(yyout, "L%d\tNADA\n", rot_fim_rep);
+    }
   ;
 
 
 selecao
   : T_SE expr T_ENTAO 
   
-  { printf("\tDSVF\tLx\n");}
+  { 
+    rot++;
+    fprintf(yyout, "\tDSVF\tL%d\n", rot);
+    empilha(rot);
+  }
 
   lista_comandos T_SENAO
   
-  { printf("\tDSVS\tLy\n");}
-  { printf("Lx\tNADA\n");}
+  { 
+    int rot_entrada_senao = desempilha();
+    rot++;
+    fprintf(yyout, "\tDSVS\tL%d\n", rot);
+    empilha(rot);
+    fprintf(yyout, "L%d\tNADA\n", rot_entrada_senao);
+    
+  }
 
    lista_comandos T_FIMSE
 
-  { printf("Ly\tNADA\n");}
+  { 
+    int rot_fim_se = desempilha();
+    fprintf(yyout, "L%d\tNADA\n", rot_fim_se);
+    
+  }
 
   ;
 
 atribuicao
-  : T_IDENTIF T_ATRIBUICAO expr
-  
-  { printf("\tARZG\tx\n");}
-
+  : T_IDENTIF
+  {
+     int pos = busca_simbolo(atomo);
+     if(pos == -1)
+        erro("Variavel nao declarada!");
+     empilha(TabSimb[pos].endereco);
+  }
+   T_ATRIBUICAO expr
+  {
+    int end = desempilha();
+    fprintf(yyout, "\tARZG\t%d\n", end);
+  }
   ;
 
 expr
   : expr T_MAIS expr
 
-  { printf("\tSOMA\n");}
+  { fprintf(yyout, "\tSOMA\n");}
 
   | expr T_MENOS expr
 
-  { printf("\tSUBT\n");}
+  { fprintf(yyout, "\tSUBT\n");}
 
   | expr T_VEZES expr
 
-  { printf("\tMULT\n");}
+  { fprintf(yyout, "\tMULT\n");}
 
   | expr T_DIV expr
 
-  { printf("\tDIVI\n");}
+  { fprintf(yyout, "\tDIVI\n");}
 
   | expr T_MAIOR expr
 
-  { printf("\tCMMA\n");}
+  { fprintf(yyout, "\tCMMA\n");}
 
   | expr T_MENOR expr
 
-  { printf("\tCMME\n");}
+  { fprintf(yyout, "\tCMME\n");}
 
   | expr T_IGUAL expr
 
-  { printf("\tCMIG\n");}
+  { fprintf(yyout, "\tCMIG\n");}
 
   | expr T_E expr
 
-  { printf("\tCONJ\n");}
+  { fprintf(yyout, "\tCONJ\n");}
 
   | expr T_OU expr
 
-  { printf("\tDISJ\n");}
+  { fprintf(yyout, "\tDISJ\n");}
 
   | termo
   ;
@@ -217,23 +275,29 @@ expr
 termo 
   : T_IDENTIF
 
-  { printf("\tCRVG\tx\n");}
+  { 
+    int pos = busca_simbolo(atomo);
+    if(pos == -1)
+      erro("Variavel nao declarada!");
+    empilha(TabSimb[pos].endereco);
+    fprintf(yyout, "\tCRVG\t%d\n", TabSimb[pos].endereco);
+  }
 
   | T_NUMERO
 
-  { printf("\tCRCT\tx\n");}
+  { fprintf(yyout, "\tCRCT\t%s\n", atomo);}
 
   | T_V
 
-  { printf("\tCRCT\t1\n");}
+  { fprintf(yyout, "\tCRCT\t1\n");}
 
   | T_F
 
-  { printf("\tCRCT\t0\n");}
+  { fprintf(yyout, "\tCRCT\t0\n");}
 
   | T_NAO termo
 
-  { printf("\tNEGA\n");}
+  { fprintf(yyout, "\tNEGA\n");}
 
   | T_ABRE expr T_FECHA
   ;
@@ -250,8 +314,27 @@ int yyerror(char *s){
   erro(s);
 }
 
-int main(){
-  if (!yyparse()){
-    puts("Programa ok");
-  }
+int main(int argc, char *argv[]) {
+    char *p, nameIn[100], nameOut[100];
+    argv++;
+    if (argc < 2) {
+        puts("\nCompilador da linguagem SIMPLES");
+        puts("\n\tUSO: ./simples <NOME>[.simples]\n\n");
+        exit(1);
+    }
+    p = strstr(argv[0], ".simples");
+    if (p) *p = 0;
+    strcpy(nameIn, argv[0]);
+    strcat(nameIn, ".simples");
+    strcpy(nameOut, argv[0]);
+    strcat(nameOut, ".mvs");
+    yyin = fopen(nameIn, "rt");
+    if (!yyin) {
+        puts ("Programa fonte não encontrado!");
+        exit(2);
+    }
+    yyout = fopen(nameOut, "wt");
+    yyparse();
+    printf("programa ok!\n\n");
+    return 0;
 }
