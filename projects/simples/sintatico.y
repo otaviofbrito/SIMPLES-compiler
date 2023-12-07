@@ -12,6 +12,7 @@ int yyerror(char *);
 
 int conta = 0;
 int rot = 0;
+int tipo;
 
 %}
 
@@ -104,8 +105,8 @@ declaracao_variaveis
   ;
 
 tipo
-  : T_LOGICO
-  | T_INTEIRO
+  : T_LOGICO {tipo ='i';}
+  | T_INTEIRO {tipo = 'l';}
   ;
 
 lista_variaveis
@@ -113,12 +114,14 @@ lista_variaveis
   {
     strcpy(elem_tab.id, atomo);
     elem_tab.endereco = conta++;   //adicionando variaveis na tab de simbolo
+    elem_tab.tipo = tipo;
     insere_simbolo(elem_tab);
   }
   | T_IDENTIF
   {
     strcpy(elem_tab.id, atomo);
     elem_tab.endereco = conta++; 
+    elem_tab.tipo = tipo;
     insere_simbolo(elem_tab);
   }
   ;
@@ -155,7 +158,10 @@ leitura
 escrita
   : T_ESCREVA expr
 
-    { fprintf(yyout, "\tESCR\n");}
+    { 
+      desempilha();
+      fprintf(yyout, "\tESCR\n");
+    }
 
   ;
 
@@ -171,6 +177,9 @@ repeticao
     expr T_FACA 
     
     {
+      int t = desempilha();
+      if (t != LOG)
+        yyerror("Incompatibilidade de tipo!");
       rot++; 
       fprintf(yyout, "\tDSVF\tL%d\n", rot);
       empilha(rot);
@@ -191,6 +200,9 @@ selecao
   : T_SE expr T_ENTAO 
   
   { 
+    int t = desempilha();
+    if(t != LOG)
+      yyerror("Incompatibilidade de tipo!");
     rot++;
     fprintf(yyout, "\tDSVF\tL%d\n", rot);
     empilha(rot);
@@ -223,51 +235,81 @@ atribuicao
      int pos = busca_simbolo(atomo);
      if(pos == -1)
         erro("Variavel nao declarada!");
-     empilha(TabSimb[pos].endereco);
+     empilha(pos);
   }
    T_ATRIBUICAO expr
   {
-    int end = desempilha();
-    fprintf(yyout, "\tARZG\t%d\n", end);
+    int t = desempilha();
+    int p = desempilha();
+    if(t != TabSimb[p].tipo)
+      yyerror("Incompatiblidade de tipos");
+    fprintf(yyout, "\tARZG\t%d\n", TabSimb[p].endereco);
   }
   ;
 
 expr
   : expr T_MAIS expr
 
-  { fprintf(yyout, "\tSOMA\n");}
+  { 
+    testaTipo(INT,INT,INT);
+    fprintf(yyout, "\tSOMA\n");
+  }
 
   | expr T_MENOS expr
 
-  { fprintf(yyout, "\tSUBT\n");}
+  { 
+    testaTipo(INT,INT,INT);
+    fprintf(yyout, "\tSUBT\n");
+  }
 
   | expr T_VEZES expr
 
-  { fprintf(yyout, "\tMULT\n");}
+  {
+    testaTipo(INT,INT,INT);
+    fprintf(yyout, "\tMULT\n");
+  }
 
   | expr T_DIV expr
 
-  { fprintf(yyout, "\tDIVI\n");}
+  { 
+    testaTipo(INT,INT,INT);
+    fprintf(yyout, "\tDIVI\n");
+  }
 
   | expr T_MAIOR expr
 
-  { fprintf(yyout, "\tCMMA\n");}
+  { 
+    testaTipo(INT,INT,LOG);
+    fprintf(yyout, "\tCMMA\n");  
+  }
 
   | expr T_MENOR expr
 
-  { fprintf(yyout, "\tCMME\n");}
+  { 
+    testaTipo(INT,INT,LOG);
+    fprintf(yyout, "\tCMME\n");  
+  }
 
   | expr T_IGUAL expr
 
-  { fprintf(yyout, "\tCMIG\n");}
+  { 
+    testaTipo(INT,INT,LOG);  
+    fprintf(yyout, "\tCMIG\n");
+  }
 
   | expr T_E expr
 
-  { fprintf(yyout, "\tCONJ\n");}
+  { 
+    testaTipo(LOG,LOG,LOG);
+    fprintf(yyout, "\tCONJ\n");
+  }
 
   | expr T_OU expr
 
-  { fprintf(yyout, "\tDISJ\n");}
+  { 
+    testaTipo(LOG,LOG,LOG);
+    fprintf(yyout, "\tDISJ\n");
+  }
 
   | termo
   ;
@@ -279,25 +321,40 @@ termo
     int pos = busca_simbolo(atomo);
     if(pos == -1)
       erro("Variavel nao declarada!");
-    empilha(TabSimb[pos].endereco);
     fprintf(yyout, "\tCRVG\t%d\n", TabSimb[pos].endereco);
+      empilha(TabSimb[pos].tipo);
   }
 
   | T_NUMERO
 
-  { fprintf(yyout, "\tCRCT\t%s\n", atomo);}
+  { 
+    fprintf(yyout, "\tCRCT\t%s\n", atomo);
+    empilha(INT);  
+  }
 
   | T_V
 
-  { fprintf(yyout, "\tCRCT\t1\n");}
+  { 
+    fprintf(yyout, "\tCRCT\t1\n");
+    empilha(LOG);  
+  }
 
   | T_F
 
-  { fprintf(yyout, "\tCRCT\t0\n");}
+  { 
+    fprintf(yyout, "\tCRCT\t0\n");
+    empilha(LOG);  
+  }
 
   | T_NAO termo
 
-  { fprintf(yyout, "\tNEGA\n");}
+  { 
+    int t = desempilha();
+    if(t != LOG)
+      yyerror("Incompatibilidade de tipo!");
+    fprintf(yyout, "\tNEGA\n");
+    empilha(LOG);  
+  }
 
   | T_ABRE expr T_FECHA
   ;
