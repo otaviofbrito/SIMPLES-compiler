@@ -2,6 +2,7 @@
 #include "sintatico.h" 
 void erro (char *s); 
 char atomo[100];
+int numLinha = 1;
 %}
 
 
@@ -57,7 +58,7 @@ nao                   return T_NAO;
 {identificador}       { strcpy(atomo, yytext); return T_IDENTIF;}
 {numero}              { strcpy(atomo, yytext); return T_NUMERO;}
 {espaco}         
-{novalinha}             
+{novalinha}           {numLinha++;}  
 .                      erro("LEXICO");
 
 %%

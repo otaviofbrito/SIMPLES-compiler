@@ -15,11 +15,12 @@ char nomeTipo[3][4] = {"INT", "LOG", "REG"};
 int Pilha[TAM_PIL];
 int topo = -1;
 
+//adicionar tam pos e ponteiro p lista de campos
 //tab de simbolos
 struct elem_tab_simbolos{
     char id[100];
     int endereco;
-    char tipo;
+    int tipo;
 } TabSimb[TAM_TAB], elem_tab;
 int pos_tab = 0;
 
@@ -61,8 +62,6 @@ void insere_simbolo(struct elem_tab_simbolos elem){
 void testaTipo(int tipo1, int tipo2, int ret){
     int t1 = desempilha();
     int t2 = desempilha();
-    printf("%d", t1);
-    printf("%d", t2);
 
     if(t1 != tipo1 || t2 != tipo2)
         erro("Incompatibilidade de tipo!");
@@ -77,6 +76,7 @@ void mostra_tabela(){
   for(i = 0; i<50; i++)
     printf("-");
   for(i = 0; i<pos_tab; i++)
-    printf("\n%3d | %30s | %3d | %3c", i, TabSimb[i].id, TabSimb[i].endereco, TabSimb[i].tipo);
+    printf("\n%3d | %30s | %3d | %3s", i, TabSimb[i].id, TabSimb[i].endereco,
+     TabSimb[i].tipo == INT? "INT" : "LOG");
   puts("\n");
 }

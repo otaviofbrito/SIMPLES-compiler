@@ -1,8 +1,10 @@
 programa um
   inteiro a b c
+  logico a
 inicio
-  leia a
-  enquanto a > 0 faca
+  a <- 10
+  b <- 10
+  enquanto a + 1 faca
     escreva a
     a <- a - 1
   fimenquanto

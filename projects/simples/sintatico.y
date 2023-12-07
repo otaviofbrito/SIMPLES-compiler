@@ -105,8 +105,8 @@ declaracao_variaveis
   ;
 
 tipo
-  : T_LOGICO {tipo ='i';}
-  | T_INTEIRO {tipo = 'l';}
+  : T_LOGICO {tipo = LOG;}
+  | T_INTEIRO {tipo = INT;}
   ;
 
 lista_variaveis
@@ -363,7 +363,7 @@ termo
 %%
 
 void erro(char *s){
-  printf("ERRO: %s\n", s);
+  printf("ERRO linha %d: %s\n", numLinha, s);
   exit(10);
 }
 
