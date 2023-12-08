@@ -40,12 +40,13 @@ pto_campo insere_lista(pto_campo head, char nome[100], int tipo, int pos, int de
   novo->tam = tam;
   novo->prox = NULL;
   p = head;
-  while(p && p->prox){
+  while(p !=NULL && p->prox != NULL){
     p = p->prox;
   }
-  if(p){
+  if(p != NULL){
      p->prox = novo;
-  } else {
+  }else
+  {
      head = novo;
   }
     
@@ -70,7 +71,7 @@ int sizeOfList(pto_campo head){
   pto_campo p;
   p = head;
   while(p != NULL){
-    size++;
+    size = size + p->tam; // somatorio do tamanho de todos os campos
     p = p->prox;
   }
    
@@ -86,10 +87,10 @@ char* build_list(pto_campo head){
   p = head;
   while(p != NULL){
     if(p->prox != NULL){
-       sprintf(list2, "(%s, %d, %d, %d ,%d)=>", head->nome, head->tipo, head->pos, head->desl, head->tam);
+       sprintf(list2, "(%s, %d, %d, %d ,%d)=>", p->nome, p->tipo, p->pos, p->desl, p->tam);
        strcat(list, list2);
     }else{
-       sprintf(list2, "(%s, %d, %d, %d ,%d)", head->nome, head->tipo, head->pos, head->desl, head->tam);
+       sprintf(list2, "(%s, %d, %d, %d ,%d)", p->nome, p->tipo, p->pos, p->desl, p->tam);
        strcat(list, list2);
     }
     p = p->prox;

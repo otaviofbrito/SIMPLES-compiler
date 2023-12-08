@@ -1,18 +1,17 @@
 programa registro1
-def
-  inteiro a
-  logico b
-fimdef c
-
-def
-  inteiro w
-  logico v
-fimdef d
-
-
-inteiro x
-registro c y 
-registro d j
-
+def                
+  inteiro a       
+  logico b        
+fimdef c           
+                   
+def               
+  registro c x     
+  inteiro y       
+fimdef d       
+                  
+inteiro x         
+registro d y   
+logico z         
+                  
 inicio
 fimprograma

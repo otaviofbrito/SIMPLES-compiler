@@ -18,8 +18,9 @@ int ehRegistro = 0;
 int tam;
 int des = 0;
 int type_pos = 0;
+int pos;
 
-pto_campo head = NULL;
+pto_campo head;
 
 
 %}
@@ -137,13 +138,13 @@ tipo
       // Além do tipo, precisa guardar o TAM (tamanho) do
       // tipo e a POS (posição) do tipo na tab. símbolos
       tam = 1;
-      type_pos = 1;
+      pos = 1;
     }
   | T_INTEIRO 
     {
       tipo = INT;
       tam = 1;
-      type_pos = 0;
+      pos = 0;
       //TODO #1 -- FEITO
       }
   | T_REGISTRO T_IDENTIF 
@@ -152,9 +153,9 @@ tipo
         // TODO #2 -- FEITO
         // Aqui tem uma chamada de buscaSimbolo para encontrar
         // as informações de TAM e POS do registro
-      int pos = busca_simbolo(atomo);
-      tam = TabSimb[pos].tam;
-      type_pos = TabSimb[pos].pos;
+      int p = busca_simbolo(atomo);
+      tam = TabSimb[p].tam;
+      pos = TabSimb[p].pos;
 
     }
   ;
@@ -205,16 +206,16 @@ lista_campos
 
         char nome[100];
         strcpy(nome, atomo);
-        des = type_pos + tam;
-        head = insere_lista(head, nome, tipo,  type_pos, des, tam);
+        des = pos + tam;
+        head = insere_lista(head, nome, tipo,  pos, des, tam);
 
       }
    | T_IDENTIF
       {
         char nome[100];
         strcpy(nome, atomo);
-        des = type_pos + tam;
-        head = insere_lista(head, nome, tipo,  type_pos, des, tam);
+        des = pos + tam;
+        head = insere_lista(head, nome, tipo,  pos, des, tam);
       }
    ;
 
@@ -237,18 +238,25 @@ lista_variaveis
     elem_tab.endereco = conta;   //adicionando variaveis na tab de simbolo
     elem_tab.tipo = tipo;
     elem_tab.tam = tam;
-    elem_tab.pos = type_pos;
+    elem_tab.pos = pos;
+     if(TabSimb[pos].tipo != REG){
+        conta++; 
+        elem_tab.lista_campos = NULL;
+     }else{
+      elem_tab.lista_campos = TabSimb[pos].lista_campos;
+      conta = conta + tam;
+    }
+      
+    insere_simbolo(elem_tab);
+
     // TODO #6 -- FEITO
     // Tem outros campos para acrescentar na tab. símbolos
-    insere_simbolo(elem_tab);
   
     // TODO #7 -- FEITO
     // Se a variavel for registro
     // contaVar = contaVar + TAM (tamanho do registro)
-    if(!ehRegistro)
-        conta++; 
-    else
-      conta = conta + tam;
+   
+  
 
   }
   | T_IDENTIF
@@ -257,15 +265,21 @@ lista_variaveis
     elem_tab.endereco = conta; 
     elem_tab.tipo = tipo;
     elem_tab.tam = tam;
-    elem_tab.pos = type_pos;
-    // idem
+    elem_tab.pos = pos;
+
+    if(TabSimb[pos].tipo != REG){
+        conta++; 
+        elem_tab.lista_campos = NULL;
+     }else{
+      elem_tab.lista_campos = TabSimb[pos].lista_campos;
+      conta = conta + tam;
+    }
+
     insere_simbolo(elem_tab);
     
     // idem
-    if(!ehRegistro)
-        conta++; 
-    else
-      conta = conta + tam;
+    // idem
+
   }
   ;
 
@@ -483,13 +497,13 @@ expressao_acesso
               // 2. se não for do tipo registo tem erro
               // 3. guardar o TAM, POS e DES desse t_IDENTIF
 
-              int pos = busca_simbolo(atomo);
-              if(TabSimb[pos].tipo != REG)
+              int p = busca_simbolo(atomo);
+              if(TabSimb[p].tipo != REG)
                 erro("type mismatch error");
 
-              tam = TabSimb[pos].tam;
-              type_pos = TabSimb[pos].pos;
-              des = TabSimb[pos].endereco;  
+              tam = TabSimb[p].tam;
+              pos = TabSimb[p].pos;
+              des = TabSimb[p].endereco;  
 
            } else {
               //--- Campo que eh registro
@@ -526,12 +540,12 @@ expressao_acesso
            }
            else {
               // TODO #14 -- FEITO
-              int pos = busca_simbolo (atomo);
-              if(pos == -1)
+              int p = busca_simbolo (atomo);
+              if(p == -1)
                 erro("variavel nao declarada!");
-              tam = TabSimb[pos].tam;
-              des = TabSimb[pos].endereco;
-              tipo = TabSimb[pos].tipo;
+              tam = TabSimb[p].tam;
+              des = TabSimb[p].endereco;
+              tipo = TabSimb[p].tipo;
 
               // guardar TAM, DES e TIPO dessa variável
            }
