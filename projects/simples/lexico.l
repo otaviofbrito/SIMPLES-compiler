@@ -53,9 +53,17 @@ nao                   return T_NAO;
 "V"                   return T_V;
 "F"                   return T_F;
 
-
+def                   return T_DEF;
+fimdef                return T_FIMDEF;
+registro              return T_REGISTRO;
 
 {identificador}       { strcpy(atomo, yytext); return T_IDENTIF;}
+{identificador}"."    { 
+                          strcpy(atomo, yytext);
+                          atomo[strlen(atomo)-1] = 0;
+                          return T_IDPONTO;
+                      }
+
 {numero}              { strcpy(atomo, yytext); return T_NUMERO;}
 {espaco}         
 {novalinha}           {numLinha++;}  

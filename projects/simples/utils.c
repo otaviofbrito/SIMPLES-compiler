@@ -21,6 +21,9 @@ struct elem_tab_simbolos{
     char id[100];
     int endereco;
     int tipo;
+    int tam;
+    int pos;
+    //ponteiro p lista de campos
 } TabSimb[TAM_TAB], elem_tab;
 int pos_tab = 0;
 
@@ -72,11 +75,11 @@ void testaTipo(int tipo1, int tipo2, int ret){
 void mostra_tabela(){
   int i;
   puts("Tabela de Simbolos");
-  printf("\n%3s | %30s | %s | %s \n", "#", "ID", "END", "TIP");
-  for(i = 0; i<50; i++)
+  printf("\n%3s | %30s | %s | %s | %s | %s \n", "#", "ID", "END", "TIP", "TAM", "POS");
+  for(i = 0; i<100; i++)
     printf("-");
   for(i = 0; i<pos_tab; i++)
-    printf("\n%3d | %30s | %3d | %3s", i, TabSimb[i].id, TabSimb[i].endereco,
-     TabSimb[i].tipo == INT? "INT" : "LOG");
+    printf("\n%3d | %30s | %3d | %3s | %3d | %3d", i, TabSimb[i].id, TabSimb[i].endereco,
+     TabSimb[i].tipo == INT? "INT" : "LOG", TabSimb[i].tam, TabSimb[i].pos);
   puts("\n");
 }
