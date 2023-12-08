@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #define TAM_TAB 100
 #define TAM_PIL 100
 
@@ -9,6 +12,91 @@ enum
 };
 
 char nomeTipo[3][4] = {"INT", "LOG", "REG"};
+
+
+
+//lista encadeada de campos da tabela de simbolos
+typedef struct campo *pto_campo;
+struct campo
+{
+  char nome[100];
+  int tipo;
+  int pos;
+  int desl;
+  int tam;
+  pto_campo prox;
+};
+
+//rotinas lista de campos
+
+pto_campo insere_lista(pto_campo head, char nome[100], int tipo, int pos, int desl, int tam)
+{
+  pto_campo p, novo;
+  novo = (pto_campo)malloc(sizeof(struct campo));
+  strcpy(novo->nome, nome); 
+  novo->tipo = tipo;
+  novo->pos = pos;
+  novo->desl = desl;
+  novo->tam = tam;
+  novo->prox = NULL;
+  p = head;
+  while(p && p->prox){
+    p = p->prox;
+  }
+  if(p){
+     p->prox = novo;
+  } else {
+     head = novo;
+  }
+    
+  return head;
+
+}
+
+pto_campo busca_campo(pto_campo head, char nome[100])
+{
+  pto_campo p;
+  p = head;
+  while(p && p->nome != nome)
+    p = p->prox;
+  return p;
+}
+
+
+
+
+int sizeOfList(pto_campo head){
+  int size = 0;
+  pto_campo p;
+  p = head;
+  while(p != NULL){
+    size++;
+    p = p->prox;
+  }
+   
+  return size;
+}
+
+
+char* build_list(pto_campo head){
+
+  char* list = (char*)malloc(500*sizeof(char));
+  char* list2 = (char*)malloc(500*sizeof(char));
+  pto_campo p;
+  p = head;
+  while(p != NULL){
+    if(p->prox != NULL){
+       sprintf(list2, "(%s, %d, %d, %d ,%d)=>", head->nome, head->tipo, head->pos, head->desl, head->tam);
+       strcat(list, list2);
+    }else{
+       sprintf(list2, "(%s, %d, %d, %d ,%d)", head->nome, head->tipo, head->pos, head->desl, head->tam);
+       strcat(list, list2);
+    }
+    p = p->prox;
+  }
+
+  return list;
+}
 
 
 //pilha semantica
@@ -23,7 +111,7 @@ struct elem_tab_simbolos{
     int tipo;
     int tam;
     int pos;
-    //ponteiro p lista de campos
+    pto_campo lista_campos; //ponteiro p lista de campos
 } TabSimb[TAM_TAB], elem_tab;
 int pos_tab = 0;
 
@@ -75,11 +163,19 @@ void testaTipo(int tipo1, int tipo2, int ret){
 void mostra_tabela(){
   int i;
   puts("Tabela de Simbolos");
-  printf("\n%3s | %30s | %s | %s | %s | %s \n", "#", "ID", "END", "TIP", "TAM", "POS");
+  printf("\n%3s | %30s | %s | %s | %s | %s | %s\n", "#", "ID", "END", "TIP", "TAM", "POS", "CAMPOS");
   for(i = 0; i<100; i++)
     printf("-");
   for(i = 0; i<pos_tab; i++)
-    printf("\n%3d | %30s | %3d | %3s | %3d | %3d", i, TabSimb[i].id, TabSimb[i].endereco,
-     TabSimb[i].tipo == INT? "INT" : "LOG", TabSimb[i].tam, TabSimb[i].pos);
+    if(TabSimb[i].tipo == REG){
+      printf("\n%3d | %30s | %3d | %3s | %3d | %3d | %3s", i, TabSimb[i].id, TabSimb[i].endereco, "REG",
+       TabSimb[i].tam, TabSimb[i].pos, build_list(TabSimb[i].lista_campos) );
+    } else{
+      printf("\n%3d | %30s | %3d | %3s | %3d | %3d | %3s", i, TabSimb[i].id, TabSimb[i].endereco,
+     TabSimb[i].tipo == INT? "INT" : "LOG", TabSimb[i].tam, TabSimb[i].pos, "-");
+    }
+    
   puts("\n");
 }
+
+

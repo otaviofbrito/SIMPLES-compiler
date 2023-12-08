@@ -1,12 +1,18 @@
-programa um
-inteiro a b
-logico c
+programa registro1
+def
+  inteiro a
+  logico b
+fimdef c
+
+def
+  inteiro w
+  logico v
+fimdef d
+
+
 inteiro x
+registro c y 
+registro d j
+
 inicio
-  a <- 10
-  b <- 10
-  enquanto a > 1 faca
-    escreva a
-    a <- a - 1
-  fimenquanto
 fimprograma
