@@ -307,15 +307,16 @@ entrada
 
     { 
     // int p = busca_simbolo(atomo);
-    //tam = TabSimb[p].tam;
 
      // TODO #8
      // Se for registro, tem que fazer uma repetição do
      // TAM do registro de leituras
      
-     fprintf(yyout, "\tLEIA\n");
-     for (int i = 0; i < tam; i++)
-       fprintf(yyout, "\tARZG\t%d\n", des);
+     for (int i = 0; i < tam; i++){
+       fprintf(yyout, "\tLEIA\n");
+       fprintf(yyout, "\tARZG\t%d\n", des+i);
+     }
+       
      }
 
   ;
