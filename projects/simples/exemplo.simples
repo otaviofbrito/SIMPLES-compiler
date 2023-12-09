@@ -1,3 +1,6 @@
+/*
+ERRO na linha 13: Incompatibilidade de tipo!
+*/
 programa registro15
    def
       inteiro a

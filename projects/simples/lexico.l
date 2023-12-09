@@ -1,4 +1,16 @@
 %{
+/*
+-|--------------------------------------------------|-
+ |                Universidade Federal de Alfenas
+ |Trabalho....:Registro e verificação de tipos
+ |Disciplina..:Teoria de Linguagens e Compiladores
+ |Professor...:Luiz Eduardo da Silva
+ |Aluno.......:Otavio Ferreira de Brito Silveira
+ |Data........:09/12/2023
+-|--------------------------------------------------|-
+*/
+
+
 #include "sintatico.h" 
 void erro (char *s); 
 char atomo[100];
@@ -10,6 +22,8 @@ identificador      [a-zA-Z]([a-zA-Z0-9])*
 numero             [0-9]+
 espaco             [ \t]+
 novalinha          [\n]
+
+%x coment
 
 %option noyywrap
 
@@ -67,6 +81,13 @@ registro              return T_REGISTRO;
 {numero}              { strcpy(atomo, yytext); return T_NUMERO;}
 {espaco}         
 {novalinha}           {numLinha++;}  
-.                      erro("LEXICO");
 
+"//".*                 ;
+"/*"                   BEGIN(coment);
+<coment>"*/"           BEGIN(INITIAL);
+<coment>.              ;
+<coment>\n             {numLinha++;}
+
+
+.                      erro(">>Erro léxico<<");
 %%

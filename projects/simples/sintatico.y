@@ -1,4 +1,15 @@
 %{
+/*
+-|--------------------------------------------------|-
+ |                Universidade Federal de Alfenas
+ |Trabalho....:Registro e verificação de tipos
+ |Disciplina..:Teoria de Linguagens e Compiladores
+ |Professor...:Luiz Eduardo da Silva
+ |Aluno.......:Otavio Ferreira de Brito Silveira
+ |Data........:09/12/2023
+-|--------------------------------------------------|-
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,7 +28,7 @@ int tipo;
 int ehRegistro = 0;
 int tam;
 int des = 0;
-int type_pos = 0;
+int type_pos = 0; //controla  a posição dos tipos na tabela de símbolos
 int pos;
 
 pto_campo head;
@@ -85,14 +96,18 @@ pto_campo head;
 programa 
   :
     {
-      //pre-cadastro de tipos na tabela de simbolos
+      //pré-cadastro de tipos na tabela de simbolos
+      //-----tipo inteiro----
       strcpy(elem_tab.id, "inteiro");
       elem_tab.endereco = -1;
       elem_tab.tipo = INT;
       elem_tab.tam = 1;
       elem_tab.pos = type_pos;
       insere_simbolo(elem_tab);
-      type_pos++; //incrementando pos;
+      type_pos++; 
+      
+
+      //-----tipo lógico----
       strcpy(elem_tab.id, "logico");
       elem_tab.endereco = -1;
       elem_tab.tipo = LOG;
@@ -133,26 +148,29 @@ cabecalho
 tipo
   : T_LOGICO 
     {
-      tipo = LOG;
       // TODO #1 -- FEITO
       // Além do tipo, precisa guardar o TAM (tamanho) do
       // tipo e a POS (posição) do tipo na tab. símbolos
+      
+      tipo = LOG;
       tam = 1;
       pos = 1;
     }
   | T_INTEIRO 
     {
+      //TODO #1 -- FEITO
+      
       tipo = INT;
       tam = 1;
       pos = 0;
-      //TODO #1 -- FEITO
       }
   | T_REGISTRO T_IDENTIF 
     {
+      // TODO #2 -- FEITO
+      // Aqui tem uma chamada de buscaSimbolo para encontrar
+      // as informações de TAM e POS do registro
+      
       tipo = REG;
-        // TODO #2 -- FEITO
-        // Aqui tem uma chamada de buscaSimbolo para encontrar
-        // as informações de TAM e POS do registro
       int p = busca_simbolo(atomo);
       tam = TabSimb[p].tam;
       pos = TabSimb[p].pos;
@@ -171,14 +189,16 @@ define
         {
             // TODO #3 -- FEITO
             // Iniciar a lista de campos
+            
             //ponteiro do inicio da lista de campos
             head = NULL;
         } 
    definicao_campos T_FIMDEF T_IDENTIF
        {
-           // TODO #4 -- FEITO
-           // Inserir esse novo tipo na tabela de simbolos
-           // com a lista que foi montada
+          // TODO #4 -- FEITO
+          // Inserir esse novo tipo na tabela de simbolos
+          // com a lista que foi montada
+          
           strcpy(elem_tab.id, atomo); // adicionando registro na tabela de simbolos
           elem_tab.endereco = -1;   
           elem_tab.tipo = REG;
@@ -187,7 +207,7 @@ define
           elem_tab.lista_campos = head;
           insere_simbolo(elem_tab);
           type_pos++;
-          des=0;
+          des=0;          // resetar deslocamento para caso exista definição de um novo registro
        }
    ;
 
@@ -199,7 +219,7 @@ definicao_campos
 lista_campos
    : lista_campos T_IDENTIF
       {
-         // TODO #5 -- FEITO?
+         // TODO #5 -- FEITO
          // acrescentar esse campo na lista de campos que
          // esta sendo construida
          // o deslocamento (endereço) do próximo campo
@@ -236,7 +256,7 @@ lista_variaveis
   : lista_variaveis T_IDENTIF 
   {
     strcpy(elem_tab.id, atomo);
-    elem_tab.endereco = conta;   //adicionando variaveis na tab de simbolo
+    elem_tab.endereco = conta;   //adicionando variaveis na tabela de simbolos
     elem_tab.tipo = tipo;
     elem_tab.tam = tam;
     elem_tab.pos = pos;
@@ -306,8 +326,6 @@ entrada
   : T_LEIA expressao_acesso
 
     { 
-    // int p = busca_simbolo(atomo);
-
      // TODO #8
      // Se for registro, tem que fazer uma repetição do
      // TAM do registro de leituras
@@ -325,7 +343,7 @@ saida
   : T_ESCREVA expr
 
     { 
-      tipo = desempilha();     //???
+      tipo = desempilha();     //desempilhar o tipo que está sobrando no topo da pilha
  
       // TODO #9
       // Se for registro, tem que fazer uma repetição do
@@ -505,7 +523,7 @@ expressao_acesso
 
               int p = busca_simbolo(atomo);
               if(TabSimb[p].tipo != REG)
-                erro("identificador não é registro!");
+                erro("Identificador não é registro!");
               
               tam = TabSimb[p].tam;
               tipo = TabSimb[p].pos;
@@ -518,11 +536,12 @@ expressao_acesso
               // 2. se não encontrar, erro
               // 3. se encontrar e não for registro, erro
               // 4. guardar o TAM, POS e DES desse CAMPO
-              pto_campo campo = busca_campo(TabSimb[tipo].lista_campos, atomo);
+              
+              pto_campo campo = busca_campo(TabSimb[tipo].lista_campos, atomo);  //buscar na lista de campos do registro que passou anteriormente por T_IDPONTO
               if(campo == NULL)
-                erro("campo nao encontrado");
+                erro("Campo não existe na estrutura!");
               if(campo->tipo != REG)
-                erro("campo nao eh registro");
+                erro("Campo não é registro.");
               tam = campo->tam;
               tipo = campo->pos;
               des = des + campo->desl;
@@ -532,26 +551,28 @@ expressao_acesso
    | T_IDENTIF
        {   
            if (ehRegistro) {
-               // TODO #13 -- FEITO?
+               // TODO #13 -- FEITO
                // 1. buscar esse campo na lista de campos
                // 2. Se não encontrar, erro
                // 3. guardar o TAM, DES e TIPO desse campo.
                //    o tipo (TIP) nesse caso é a posição do tipo
                //    na tabela de simbolos
+              
               pto_campo campo = busca_campo(TabSimb[tipo].lista_campos, atomo);
 
                if(campo == NULL)
-                erro("O campo nao existe na estrutura!");
+                erro("O campo não existe na estrutura!");
 
                tam = campo->tam;
-               des = des + campo->desl;        //alterei des = campo->desl
+               des = des + campo->desl;        //deslocamento = endereço do registro + deslocamento
                tipo = campo->pos;
            }
            else {
               // TODO #14 -- FEITO
+              
               int p = busca_simbolo (atomo);
               if(p == -1)
-                erro("variavel nao declarada!");
+                erro("Variável não declarada!");
               tam = TabSimb[p].tam;
               des = TabSimb[p].endereco;
               tipo = TabSimb[p].pos;
@@ -564,11 +585,11 @@ expressao_acesso
 termo
    : expressao_acesso
        {
-          // TODO #15 -- FEITO?
+          // TODO #15 -- FEITO
           // Se for registro, tem que fazer uma repetição do
           // TAM do registro de CRVG (em ondem inversa)
 
-
+          //deslocamento + tamanho - 1 => possibilita a leitura do deslocamento relativo dentro da lista de campos
           for (int i = des+tam-1; i >= des; i--){
             fprintf(yyout, "\tCRVG\t%d\n", i);
           }

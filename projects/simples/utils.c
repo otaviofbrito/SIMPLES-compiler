@@ -1,3 +1,15 @@
+/*
+-|--------------------------------------------------|-
+ |                Universidade Federal de Alfenas
+ |Trabalho....:Registro e verificação de tipos
+ |Disciplina..:Teoria de Linguagens e Compiladores
+ |Professor...:Luiz Eduardo da Silva
+ |Aluno.......:Otavio Ferreira de Brito Silveira
+ |Data........:09/12/2023
+-|--------------------------------------------------|-
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -80,6 +92,7 @@ int sizeOfList(pto_campo head){
   return size;
 }
 
+//Função p/ auxiliar printar os tipos
 char *type_toString(int tipo){
   switch (tipo)
   {
@@ -97,6 +110,7 @@ char *type_toString(int tipo){
   }
 }
 
+//Função p/ printar a lista de campos
 char* build_list(pto_campo head){
 
   char* list = (char*)malloc(500*sizeof(char));
@@ -122,7 +136,7 @@ char* build_list(pto_campo head){
 int Pilha[TAM_PIL];
 int topo = -1;
 
-//adicionar tam pos e ponteiro p lista de campos
+//adicionar tam pos e ponteiro p/ lista de campos
 //tab de simbolos
 struct elem_tab_simbolos{
     char id[100];
@@ -130,7 +144,7 @@ struct elem_tab_simbolos{
     int tipo;
     int tam;
     int pos;
-    pto_campo lista_campos; //ponteiro p lista de campos
+    pto_campo lista_campos; //ponteiro p/ lista de campos
 } TabSimb[TAM_TAB], elem_tab;
 int pos_tab = 0;
 
