@@ -312,6 +312,7 @@ entrada
      // TODO #8
      // Se for registro, tem que fazer uma repetição do
      // TAM do registro de leituras
+     
      fprintf(yyout, "\tLEIA\n");
      for (int i = 0; i < tam; i++)
        fprintf(yyout, "\tARZG\t%d\n", des);
@@ -503,7 +504,7 @@ expressao_acesso
 
               int p = busca_simbolo(atomo);
               if(TabSimb[p].tipo != REG)
-                erro("type mismatch error");
+                erro("identificador não é registro!");
               
               tam = TabSimb[p].tam;
               tipo = TabSimb[p].pos;
@@ -539,7 +540,7 @@ expressao_acesso
               pto_campo campo = busca_campo(TabSimb[tipo].lista_campos, atomo);
 
                if(campo == NULL)
-                erro("variavel nao declarada!");
+                erro("O campo nao existe na estrutura!");
 
                tam = campo->tam;
                des = des + campo->desl;        //alterei des = campo->desl

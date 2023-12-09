@@ -1,13 +1,10 @@
-programa registro4
+programa registro15
    def
       inteiro a
-      logico b
+      inteiro b
    fimdef c
-
+   inteiro a
    registro c x y
 inicio
-   leia x.a
-   x.b <- F 
-   y <- x
-   escreva y
+   a <- x
 fimprograma
