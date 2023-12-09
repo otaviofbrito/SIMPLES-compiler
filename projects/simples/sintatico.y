@@ -312,7 +312,6 @@ entrada
      // TODO #8
      // Se for registro, tem que fazer uma repetição do
      // TAM do registro de leituras
-     printf("\n%d", tam);
      fprintf(yyout, "\tLEIA\n");
      for (int i = 0; i < tam; i++)
        fprintf(yyout, "\tARZG\t%d\n", des);
@@ -324,8 +323,8 @@ saida
   : T_ESCREVA expr
 
     { 
-      
-      tam = desempilha(); 
+      tipo = desempilha();     //???
+ 
       // TODO #9
       // Se for registro, tem que fazer uma repetição do
       // TAM do registro de escritas
@@ -518,14 +517,13 @@ expressao_acesso
               // 3. se encontrar e não for registro, erro
               // 4. guardar o TAM, POS e DES desse CAMPO
               pto_campo campo = busca_campo(TabSimb[tipo].lista_campos, atomo);
-
               if(campo == NULL)
                 erro("campo nao encontrado");
               if(campo->tipo != REG)
                 erro("campo nao eh registro");
               tam = campo->tam;
               tipo = campo->pos;
-              des = campo->desl;
+              des = des + campo->desl;
            }
        }
      expressao_acesso
@@ -567,11 +565,12 @@ termo
           // TODO #15 -- FEITO?
           // Se for registro, tem que fazer uma repetição do
           // TAM do registro de CRVG (em ondem inversa)
-          
-          for (int i = tam; i > 0; i--)
-            fprintf(yyout, "\tCRVG\t%d\n", des+i);
+
+
+          for (int i = des+tam-1; i >= des; i--){
+            fprintf(yyout, "\tCRVG\t%d\n", i);
+          }
           empilha(tipo);
-          empilha(tam);
        }
 
   | T_NUMERO
