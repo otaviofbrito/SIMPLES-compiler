@@ -187,6 +187,7 @@ define
           elem_tab.lista_campos = head;
           insere_simbolo(elem_tab);
           type_pos++;
+          des=0;
        }
    ;
 
@@ -206,16 +207,16 @@ lista_campos
 
         char nome[100];
         strcpy(nome, atomo);
-        des = pos + tam;
         head = insere_lista(head, nome, tipo,  pos, des, tam);
+        des = des + tam;
 
       }
    | T_IDENTIF
       {
         char nome[100];
         strcpy(nome, atomo);
-        des = pos + tam;
         head = insere_lista(head, nome, tipo,  pos, des, tam);
+        des = des + tam;
       }
    ;
 
@@ -295,24 +296,26 @@ comando
    | repeticao
    ;
 
-entrada_saida
+entrada_saida 
    : entrada
    | saida 
    ;
 
 
 entrada
-  : T_LEIA T_IDENTIF
+  : T_LEIA expressao_acesso
 
     { 
-     int pos = busca_simbolo(atomo);
+    // int p = busca_simbolo(atomo);
+    //tam = TabSimb[p].tam;
+
      // TODO #8
      // Se for registro, tem que fazer uma repetição do
      // TAM do registro de leituras
+     printf("\n%d", tam);
      fprintf(yyout, "\tLEIA\n");
-     if(pos == -1)
-        erro("Variavel nao declarada!");
-     fprintf(yyout, "\tARZG\t%d\n", TabSimb[pos].endereco);
+     for (int i = 0; i < tam; i++)
+       fprintf(yyout, "\tARZG\t%d\n", des);
      }
 
   ;
@@ -321,11 +324,13 @@ saida
   : T_ESCREVA expr
 
     { 
-      desempilha();
+      
+      tam = desempilha(); 
       // TODO #9
       // Se for registro, tem que fazer uma repetição do
       // TAM do registro de escritas
-      fprintf(yyout, "\tESCR\n");
+      for (int i = 0; i < tam; i++)
+        fprintf(yyout, "\tESCR\n");
     }
 
   ;
@@ -333,7 +338,7 @@ saida
 atribuicao
    : expressao_acesso
        { 
-         // TODO #10 - FEITO -- verificar pos do reg
+         // TODO #10 - FEITO 
          // Tem que guardar o TAM, DES e o TIPO (POS do tipo, se for registro)
           empilha(tam);
           empilha(des);
@@ -343,8 +348,8 @@ atribuicao
        { 
           int tipexp = desempilha();
           int tipvar = desempilha();
-          int des = desempilha();
-          int tam = desempilha(); 
+          des = desempilha();
+          tam = desempilha(); 
 
           if (tipexp != tipvar)
              yyerror("Incompatibilidade de tipo!");
@@ -500,20 +505,24 @@ expressao_acesso
               int p = busca_simbolo(atomo);
               if(TabSimb[p].tipo != REG)
                 erro("type mismatch error");
-
+              
               tam = TabSimb[p].tam;
-              pos = TabSimb[p].pos;
-              des = TabSimb[p].endereco;  
-
+              tipo = TabSimb[p].pos;
+              des = TabSimb[p].endereco;
+         
+              
            } else {
               //--- Campo que eh registro
               // 1. busca esse campo na lista de campos
               // 2. se não encontrar, erro
               // 3. se encontrar e não for registro, erro
               // 4. guardar o TAM, POS e DES desse CAMPO
-              pto_campo campo = busca_campo(head, atomo);
-              if(!campo)
+              pto_campo campo = busca_campo(TabSimb[tipo].lista_campos, atomo);
+
+              if(campo == NULL)
                 erro("campo nao encontrado");
+              if(campo->tipo != REG)
+                erro("campo nao eh registro");
               tam = campo->tam;
               tipo = campo->pos;
               des = campo->desl;
@@ -529,13 +538,13 @@ expressao_acesso
                // 3. guardar o TAM, DES e TIPO desse campo.
                //    o tipo (TIP) nesse caso é a posição do tipo
                //    na tabela de simbolos
+              pto_campo campo = busca_campo(TabSimb[tipo].lista_campos, atomo);
 
-               pto_campo campo = busca_campo(head, atomo);
-               if(!campo)
+               if(campo == NULL)
                 erro("variavel nao declarada!");
 
                tam = campo->tam;
-               des = campo->desl;
+               des = des + campo->desl;        //alterei des = campo->desl
                tipo = campo->pos;
            }
            else {
@@ -545,7 +554,7 @@ expressao_acesso
                 erro("variavel nao declarada!");
               tam = TabSimb[p].tam;
               des = TabSimb[p].endereco;
-              tipo = TabSimb[p].tipo;
+              tipo = TabSimb[p].pos;
 
               // guardar TAM, DES e TIPO dessa variável
            }
@@ -558,11 +567,11 @@ termo
           // TODO #15 -- FEITO?
           // Se for registro, tem que fazer uma repetição do
           // TAM do registro de CRVG (em ondem inversa)
-     
-    
+          
           for (int i = tam; i > 0; i--)
-            fprintf(yyout, "\tCRVG\t%d\n", des + i);
+            fprintf(yyout, "\tCRVG\t%d\n", des+i);
           empilha(tipo);
+          empilha(tam);
        }
 
   | T_NUMERO

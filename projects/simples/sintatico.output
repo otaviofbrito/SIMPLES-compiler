@@ -49,7 +49,7 @@ Grammar
    29 entrada_saida: entrada
    30              | saida
 
-   31 entrada: T_LEIA T_IDENTIF
+   31 entrada: T_LEIA expressao_acesso
 
    32 saida: T_ESCREVA expr
 
@@ -126,7 +126,7 @@ Terminals, with rules where they appear
     T_FECHA (284) 59
     T_V (285) 56
     T_F (286) 57
-    T_IDENTIF (287) 5 8 12 15 16 21 22 31 53
+    T_IDENTIF (287) 5 8 12 15 16 21 22 53
     T_NUMERO (288) 55
     T_DEF (289) 12
     T_FIMDEF (290) 12
@@ -224,7 +224,7 @@ Nonterminals, with rules where they appear
         on right: 32 34 37 40 41 42 43 44 45 46 47 48 49 59
     expressao_acesso (67)
         on left: 52 53
-        on right: 34 52 54
+        on right: 31 34 52 54
     $@10 (68)
         on left: 51
         on right: 52
@@ -550,9 +550,12 @@ State 33
 
 State 34
 
-   31 entrada: T_LEIA . T_IDENTIF
+   31 entrada: T_LEIA . expressao_acesso
 
-    T_IDENTIF  shift, and go to state 49
+    T_IDENTIF  shift, and go to state 38
+    T_IDPONTO  shift, and go to state 39
+
+    expressao_acesso  go to state 49
 
 
 State 35
@@ -698,7 +701,7 @@ State 48
 
 State 49
 
-   31 entrada: T_LEIA T_IDENTIF .
+   31 entrada: T_LEIA expressao_acesso .
 
     $default  reduce using rule 31 (entrada)
 

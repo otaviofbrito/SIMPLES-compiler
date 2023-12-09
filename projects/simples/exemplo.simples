@@ -1,17 +1,13 @@
-programa registro1
-def                
-  inteiro a       
-  logico b        
-fimdef c           
-                   
-def               
-  registro c x     
-  inteiro y       
-fimdef d       
-                  
-inteiro x         
-registro d y   
-logico z         
-                  
+programa registro4
+   def
+      inteiro a
+      logico b
+   fimdef c
+
+   registro c x y
 inicio
+   leia x.a
+   x.b <- F 
+   y <- x
+   escreva y
 fimprograma

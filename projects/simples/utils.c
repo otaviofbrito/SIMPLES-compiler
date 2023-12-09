@@ -58,8 +58,10 @@ pto_campo busca_campo(pto_campo head, char nome[100])
 {
   pto_campo p;
   p = head;
-  while(p && p->nome != nome)
-    p = p->prox;
+  
+  while(p && strcmp(p->nome, nome)){
+    p = p->prox; 
+  }
   return p;
 }
 
@@ -78,6 +80,22 @@ int sizeOfList(pto_campo head){
   return size;
 }
 
+char *type_toString(int tipo){
+  switch (tipo)
+  {
+  case REG:
+    return "REG";
+    break;
+  case INT:
+    return "INT";
+    break;
+  case LOG:
+    return "LOG";
+    break;
+  default:
+    return "?";
+  }
+}
 
 char* build_list(pto_campo head){
 
@@ -87,10 +105,10 @@ char* build_list(pto_campo head){
   p = head;
   while(p != NULL){
     if(p->prox != NULL){
-       sprintf(list2, "(%s, %d, %d, %d ,%d)=>", p->nome, p->tipo, p->pos, p->desl, p->tam);
+       sprintf(list2, "(%s, %s, %d, %d ,%d)=>", p->nome, type_toString(p->tipo), p->pos, p->desl, p->tam);
        strcat(list, list2);
     }else{
-       sprintf(list2, "(%s, %d, %d, %d ,%d)", p->nome, p->tipo, p->pos, p->desl, p->tam);
+       sprintf(list2, "(%s, %s, %d, %d ,%d)", p->nome, type_toString(p->tipo), p->pos, p->desl, p->tam);
        strcat(list, list2);
     }
     p = p->prox;
