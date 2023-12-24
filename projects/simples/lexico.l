@@ -1,14 +1,4 @@
 %{
-/*
--|--------------------------------------------------|-
- |                Universidade Federal de Alfenas
- |Trabalho....:Registro e verificação de tipos
- |Disciplina..:Teoria de Linguagens e Compiladores
- |Professor...:Luiz Eduardo da Silva
- |Aluno.......:Otavio Ferreira de Brito Silveira
- |Data........:09/12/2023
--|--------------------------------------------------|-
-*/
 
 
 #include "sintatico.h" 
